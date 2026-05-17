@@ -35,12 +35,14 @@ public class AuthService {
         userRepository.save(user);
 
         try {
-            emailService.sendOtpEmail(user.getEmail(), generatedOtp);
-            return ResponseEntity.ok(Map.of("message", "OTP sent to your email. Valid for 5 minutes."));
-        } catch (Exception e) {
-            userRepository.delete(user);
-            return ResponseEntity.status(500).body(Map.of("message", "Error: Failed to send email."));
-        }
+    emailService.sendOtpEmail(user.getEmail(), generatedOtp);
+    return ResponseEntity.ok(Map.of("message", "OTP sent to your email. Valid for 5 minutes."));
+} catch (Exception e) {
+    System.out.println("Error! failed to send email: " + e.getMessage());
+    e.printStackTrace(); 
+    userRepository.delete(user);
+    return ResponseEntity.status(500).body(Map.of("message", "Error: Failed to send email. Please check server logs."));
+}
     }
 
     public ResponseEntity<?> verifyOtp(String email, String otp, String purpose) {
