@@ -14,10 +14,10 @@ import java.util.List;
 @Service
 public class EmailService {
     
-    @Value("${BREVO.API.KEY}")
+    @Value("${brevo.api.key}")
     private String brevoApiKey;
 
-    @Value("${BREVO.SENDER.EMAIL}")
+    @Value("${brevo.sender.email}")
     private String senderEmail;
 
     public void sendEmail(String to, String subject, String body) {
