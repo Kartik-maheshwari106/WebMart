@@ -14,10 +14,10 @@ import java.util.List;
 @Service
 public class EmailService {
     
-    @Value("${brevo.api.key}")
+    @Value("${BREVO.API.KEY}")
     private String brevoApiKey;
 
-    @Value("${brevo.sender.email}")
+    @Value("${BREVO.SENDER.EMAIL}")
     private String senderEmail;
 
     public void sendEmail(String to, String subject, String body) {
@@ -37,11 +37,16 @@ public class EmailService {
 
         HttpEntity<Map<String, Object>> entity = new HttpEntity<>(bodyMap, headers);
 
-        try {
+       try {
             ResponseEntity<String> response = restTemplate.exchange(url, HttpMethod.POST, entity, String.class);
             System.out.println("🟢 Brevo API Success: Email Sent to " + to);
+        } catch (org.springframework.web.client.HttpStatusCodeException e) {
+            // YE LINE ASLI CHOR KO PAKDEGI
+            System.out.println("🔴 BREVO REJECTED! Exact Error: " + e.getResponseBodyAsString());
+            e.printStackTrace();
+            throw new RuntimeException("Failed to send email via Brevo API");
         } catch (Exception e) {
-            System.out.println("🔴 Brevo API Failed! Reason: " + e.getMessage());
+            System.out.println("🔴 BREVO NETWORK ERROR: " + e.getMessage());
             e.printStackTrace();
             throw new RuntimeException("Failed to send email via Brevo API");
         }
