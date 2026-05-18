@@ -21,6 +21,11 @@ public class EmailService {
     private String senderEmail;
 
     public void sendEmail(String to, String subject, String body) {
+        if (brevoApiKey == null || brevoApiKey.equals("missing") || brevoApiKey.isEmpty()) {
+            System.out.println("🔴 ERROR: BREVO API KEY RENDER SE NAHI MILI!");
+            throw new RuntimeException("API Key Missing");
+        }
+
         String url = "https://api.brevo.com/v3/smtp/email";
         RestTemplate restTemplate = new RestTemplate();
 
@@ -37,11 +42,10 @@ public class EmailService {
 
         HttpEntity<Map<String, Object>> entity = new HttpEntity<>(bodyMap, headers);
 
-       try {
+        try {
             ResponseEntity<String> response = restTemplate.exchange(url, HttpMethod.POST, entity, String.class);
             System.out.println("🟢 Brevo API Success: Email Sent to " + to);
         } catch (org.springframework.web.client.HttpStatusCodeException e) {
-            // YE LINE ASLI CHOR KO PAKDEGI
             System.out.println("🔴 BREVO REJECTED! Exact Error: " + e.getResponseBodyAsString());
             e.printStackTrace();
             throw new RuntimeException("Failed to send email via Brevo API");
