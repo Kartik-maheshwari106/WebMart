@@ -36,11 +36,15 @@ const RegisterPage = () => {
 
       navigate(`/verify-otp?email=${encodeURIComponent(form.email)}`);
     } catch (error: any) {
-      const errorMsg = error.response?.data || "";
+      // BIKUL NAYA LOGIC: Object aur String dono ko safely handle karega
+      const responseData = error.response?.data;
+      const errorMsg = typeof responseData === 'string' 
+        ? responseData 
+        : (responseData?.message || "Registration failed!");
+
       const isAlreadyUsed = typeof errorMsg === 'string' && errorMsg.toLowerCase().includes("already use");
 
       if (isAlreadyUsed) {
-
         toast((t) => (
           <span className="text-xs font-medium">
             Email already exists. Need to verify? 
@@ -56,7 +60,8 @@ const RegisterPage = () => {
           </span>
         ), { duration: 5000 });
       } else {
-        toast.error(errorMsg || "Registration failed!");
+        // Ab React kabhi crash nahi hoga kyunki errorMsg hamesha Text(String) hoga
+        toast.error(errorMsg);
       }
       console.log("Error Status:", error.response?.status);
     } finally {

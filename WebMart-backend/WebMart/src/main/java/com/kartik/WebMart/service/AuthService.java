@@ -30,22 +30,15 @@ public class AuthService {
         String generatedOtp = String.format("%06d", new Random().nextInt(1000000));
         user.setOtp(generatedOtp);
         user.setVerified(false); 
-        user.setOtpExpiryTime(LocalDateTime.now().plusMinutes(5)); // Time badha diya safety ke liye
+        user.setOtpExpiryTime(LocalDateTime.now().plusMinutes(5)); 
 
         userRepository.save(user);
 
-        // =========================================================
-        // RESEND API INTEGRATION
-        // Ab ye function Gmail ki jagah direct Resend API trigger karega
-        // =========================================================
         try {
             emailService.sendOtpEmail(user.getEmail(), generatedOtp);
             return ResponseEntity.ok(Map.of("message", "OTP sent to your email. Valid for 5 minutes."));
         } catch (Exception e) {
-            // =========================================================
-            // PURANA ERROR LOGGING (Backup - Kuch nahi hataya)
-            // =========================================================
-            System.out.println("Error! failed to send email: " + e.getMessage());
+            System.out.println("🔴 Error! failed to send email: " + e.getMessage());
             e.printStackTrace(); 
             userRepository.delete(user);
             return ResponseEntity.status(500).body(Map.of("message", "Error: Failed to send email. Please check server logs."));
